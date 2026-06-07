@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DisCo — NeurIPS 2026 Workshop Proposal</title>
+  <meta name="description" content="DisCo: Discrete Generation via Continuous Flows and Diffusion. A workshop proposal submitted to NeurIPS 2026.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --color-hero: #0d1117;
+      --color-hero-subtle: #161b22;
+      --color-text: #1f2937;
+      --color-text-secondary: #6b7280;
+      --color-bg: #ffffff;
+      --color-bg-alt: #f8f9fa;
+      --color-border: #e5e7eb;
+      --color-card: #ffffff;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --disco-gradient: linear-gradient(135deg, #fbbf24, #f472b6, #a78bfa, #38bdf8);
+      --disco-gradient-text: linear-gradient(135deg, #fcd34d, #fb7185, #c084fc, #60a5fa);
+      --max-width: 1100px;
+      --section-padding: 5rem 1.5rem;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--color-text); line-height: 1.7; }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(13, 17, 23, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+    .nav-logo {
+      font-weight: 800;
+      font-size: 1.25rem;
+      background: var(--disco-gradient-text);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 1.75rem; list-style: none; }
+    .nav-links a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #ffffff; }
+    .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 0.5rem; }
+    .nav-toggle span { display: block; width: 20px; height: 2px; background: #fff; margin: 4px 0; }
+
+    /* Hero */
+    .hero {
+      background: var(--color-hero);
+      padding: 10rem 1.5rem 6rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 30% 50%, rgba(251, 191, 36, 0.03) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 50%, rgba(168, 85, 247, 0.03) 0%, transparent 50%),
+                  radial-gradient(ellipse at 50% 80%, rgba(56, 189, 248, 0.02) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .hero-content { max-width: 800px; margin: 0 auto; position: relative; }
+    .hero-badge {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 1.5rem;
+    }
+    .hero-badge .proposal-tag {
+      display: inline-block;
+      background: rgba(251, 191, 36, 0.15);
+      color: #fbbf24;
+      padding: 0.15rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      margin-left: 0.5rem;
+      letter-spacing: 0.08em;
+      vertical-align: middle;
+    }
+    .hero-title {
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.75rem;
+      background: var(--disco-gradient-text);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-subtitle {
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+    .hero-tagline {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.5);
+      max-width: 640px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.6;
+    }
+    .hero-meta {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+    }
+    .hero-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.9rem;
+    }
+    .hero-meta-item svg { width: 18px; height: 18px; opacity: 0.6; }
+    .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.75rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: var(--disco-gradient);
+      color: #0d1117;
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.12); }
+
+    /* Sections */
+    section { padding: var(--section-padding); }
+    .section-alt { background: var(--color-bg-alt); }
+    .container { max-width: var(--max-width); margin: 0 auto; }
+    .section-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .section-header h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .section-header p {
+      color: var(--color-text-secondary);
+      font-size: 1.05rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .section-header::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 3px;
+      background: var(--disco-gradient);
+      margin: 1rem auto 0;
+      border-radius: 2px;
+    }
+
+    /* About */
+    .about-text { max-width: 780px; margin: 0 auto; font-size: 1.05rem; }
+    .about-text p { margin-bottom: 1.25rem; }
+
+    /* Topics */
+    .topics-list {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+    .topic-group { margin-bottom: 1.75rem; }
+    .topic-group:last-child { margin-bottom: 0; }
+    .topic-group > strong {
+      display: block;
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .topic-group ul {
+      list-style: disc;
+      padding-left: 1.5rem;
+      color: var(--color-text-secondary);
+    }
+    .topic-group ul li {
+      margin-bottom: 0.35rem;
+      font-size: 0.93rem;
+      line-height: 1.55;
+    }
+
+    /* Dates table */
+    .dates-table {
+      max-width: 720px;
+      margin: 0 auto;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .dates-table tr { border-bottom: 1px solid var(--color-border); }
+    .dates-table tr:last-child { border-bottom: none; }
+    .dates-table td {
+      padding: 0.7rem 0.5rem;
+      font-size: 0.95rem;
+      vertical-align: baseline;
+    }
+    .dates-table .date-label { color: var(--color-text); }
+    .dates-table .date-value {
+      font-weight: 600;
+      white-space: nowrap;
+      text-align: right;
+    }
+    .dates-table .date-countdown {
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+      text-align: right;
+      width: 220px;
+      min-width: 220px;
+      max-width: 220px;
+      padding-left: 1rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .dates-table .date-countdown.past { color: #9ca3af; }
+
+    /* Schedule */
+    .schedule-table {
+      width: 100%;
+      max-width: 780px;
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+    .schedule-table tr { border-bottom: 1px solid var(--color-border); }
+    .schedule-table td {
+      padding: 0.85rem 0.75rem;
+      font-size: 0.92rem;
+      vertical-align: top;
+    }
+    .schedule-table .time {
+      font-weight: 600;
+      white-space: nowrap;
+      width: 120px;
+      color: var(--color-text-secondary);
+      font-size: 0.85rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .schedule-table .event-title { font-weight: 600; }
+    .schedule-table .event-speaker { color: var(--color-text-secondary); font-size: 0.85rem; }
+    .schedule-table .break-row td {
+      color: var(--color-text-secondary);
+      font-style: italic;
+      font-size: 0.85rem;
+      padding: 0.6rem 0.75rem;
+    }
+
+    /* People */
+    .people-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+    .person-card {
+      text-align: center;
+      padding: 1.25rem 0.75rem;
+    }
+    .person-photo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 0.75rem;
+      display: block;
+      border: 3px solid var(--color-border);
+    }
+    .person-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 0 auto 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .person-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.15rem; }
+    .person-card .affiliation {
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+    }
+
+    .more-coming {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--color-text-secondary);
+      font-style: italic;
+      font-size: 0.95rem;
+    }
+
+    /* Submission */
+    .submission-list {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+    .submission-note {
+      max-width: 700px;
+      margin: 2rem auto 0;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--color-hero);
+      color: rgba(255, 255, 255, 0.6);
+      padding: 3rem 1.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+    footer a { color: rgba(255, 255, 255, 0.8); text-decoration: none; }
+    footer a:hover { color: #fff; }
+    .footer-inner { max-width: var(--max-width); margin: 0 auto; }
+    .footer-links { display: flex; gap: 2rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .footer-copy { opacity: 0.5; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      :root { --section-padding: 3.5rem 1.25rem; }
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 56px;
+        left: 0;
+        right: 0;
+        background: rgba(13, 17, 23, 0.98);
+        padding: 1rem 1.5rem;
+        gap: 0.75rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .nav-toggle { display: block; }
+      .hero { padding: 8rem 1.25rem 4rem; }
+      .hero-meta { gap: 1rem; }
+      .timeline { flex-direction: column; align-items: center; gap: 1.5rem; }
+      .timeline-dot::before { display: none; }
+      .people-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; }
+      .person-photo, .person-avatar { width: 80px; height: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+  <div class="nav-inner">
+    <a href="./" class="nav-logo">DisCo</a>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#topics">Topics</a></li>
+      <li><a href="#dates">Dates</a></li>
+      <li><a href="#schedule">Schedule</a></li>
+      <li><a href="#speakers">Speakers</a></li>
+      <li><a href="#organizers">Organizers</a></li>
+      <li><a href="#cfp">Call for Papers</a></li>
+      <li><a href="blog/">Blogposts</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">NeurIPS 2026 <span class="proposal-tag">Workshop Proposal</span></div>
+    <h1 class="hero-title">DisCo</h1>
+    <p class="hero-subtitle">Discrete Generation via<br>Continuous Flows and Diffusion</p>
+    <p class="hero-tagline">Continuous flows and diffusion for discrete generation across language, code, biology and structured scientific data: theory, methods, and open challenges.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Sydney, Australia
+      </div>
+      <div class="hero-meta-item">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        December 11 or 12, 2026
+      </div>
+    </div>
+    <div class="hero-buttons">
+      <a href="#cfp" class="btn btn-primary">Call for Papers</a>
+      <a href="#about" class="btn btn-secondary">Learn More</a>
+    </div>
+  </div>
+</section>
+
+<!-- About -->
+<section id="about">
+  <div class="container">
+    <div class="section-header">
+      <h2>About the Workshop</h2>
+    </div>
+    <div class="about-text">
+      <p>
+        Diffusion and flow-based models have driven many of the most significant advances in generative modeling for continuous data&mdash;images, audio, and video. These methods model a noise-to-data mapping as a differential equation, enabling fast, parallel, and controllable generation. An exciting frontier is extending these methods to <strong>discrete modalities</strong>: language, code, proteins, molecules, and scientific data.
+      </p>
+      <p>
+        While early works such as CDCD and Diffusion-LM pioneered continuous approaches to discrete generation, concurrent breakthroughs in early 2026 showed that continuous flows can match discrete diffusion for language by flowing Gaussian noise to one-hot embeddings. This has sparked rapid follow-up research and a surge of interest in the community.
+      </p>
+      <p>
+        <strong>DisCo</strong> brings together the researchers driving this progress to consolidate the taxonomy of existing methods, accelerate the development of new approaches, identify shared benchmarks and open problems, and support the growth of a more coherent research community.
+      </p>
+    </div>
+    <div class="topics-list">
+      <div class="topic-group">
+        <strong>Key questions</strong>
+        <ul>
+          <li>What theoretical foundations, training paradigms, and evaluation standards are needed to ensure consistent progress across discrete modalities?</li>
+          <li>What are the empirical trade-offs between continuous and discrete generative processes, and what is required for continuous flows to match the performance of discrete methods at scale?</li>
+          <li>How can the smooth, differentiable structure of continuous processes be used to enable controllable generation, conditioning, and alignment?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Topics -->
+<section id="topics" class="section-alt">
+  <div class="container">
+    <div class="section-header">
+      <h2>Topics of Interest</h2>
+      <p>We invite submissions spanning theory, methods, applications, critical analyses, open questions, and negative results.</p>
+    </div>
+    <div class="topics-list">
+      <div class="topic-group">
+        <strong>Flows and diffusion across discrete modalities</strong>
+        <ul>
+          <li>Language, code, molecules, proteins, biological sequences, graphs, and other scientific or structured discrete data.</li>
+          <li>Modality-specific properties and challenges for continuous generative processes.</li>
+          <li>Controllable generation through gradient-based guidance and reward alignment.</li>
+        </ul>
+      </div>
+      <div class="topic-group">
+        <strong>Method design and scaling</strong>
+        <ul>
+          <li>Training objectives, noise schedules, and embeddings (e.g., learned, geometric).</li>
+          <li>Distillation for acceleration; consistency models and flow map matching for few-step generation.</li>
+          <li>Scaling laws, data efficiency, and compute-optimal training.</li>
+        </ul>
+      </div>
+      <div class="topic-group">
+        <strong>Comparisons with existing approaches</strong>
+        <ul>
+          <li>Continuous vs. discrete diffusion trade-offs; quality&ndash;speed trade-off in few-step regimes.</li>
+          <li>Understanding the gap with autoregression; hybrid methods.</li>
+          <li>Negative results and limitations of current methods.</li>
+        </ul>
+      </div>
+      <div class="topic-group">
+        <strong>Evaluation and empirical understanding</strong>
+        <ul>
+          <li>Standardized benchmarks and fair evaluation at academic scales.</li>
+          <li>Metrics beyond generative perplexity.</li>
+          <li>Self-conditioning and other empirically important techniques that may outpace theory.</li>
+          <li>Connections to phenomena in image-domain diffusion.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Important Dates -->
+<section id="dates">
+  <div class="container">
+    <div class="section-header">
+      <h2>Important Dates</h2>
+    </div>
+    <table class="dates-table">
+      <tr><td class="date-label">Website &amp; Call for Papers</td><td class="date-value">July 14, 2026 (AoE)</td><td class="date-countdown" data-date="2026-07-15T12:00:00Z"></td></tr>
+      <tr><td class="date-label">Submission Deadline</td><td class="date-value">August 29, 2026 (AoE)</td><td class="date-countdown" data-date="2026-08-30T12:00:00Z"></td></tr>
+      <tr><td class="date-label">Acceptance Notification</td><td class="date-value">September 26, 2026</td><td class="date-countdown" data-date="2026-09-26T00:00:00Z"></td></tr>
+      <tr><td class="date-label">Camera-Ready Deadline</td><td class="date-value">October 16, 2026 (AoE)</td><td class="date-countdown" data-date="2026-10-17T12:00:00Z"></td></tr>
+      <tr><td class="date-label">Workshop Day</td><td class="date-value">December 11&ndash;12, 2026</td><td class="date-countdown" data-date="2026-12-11T00:00:00+11:00"></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- Schedule -->
+<section id="schedule" class="section-alt">
+  <div class="container">
+    <div class="section-header">
+      <h2>Schedule</h2>
+      <p>All times are local (AEDT, UTC+11).</p>
+    </div>
+    <table class="schedule-table">
+      <tr>
+        <td class="time">09:00&ndash;09:15</td>
+        <td><span class="event-title">Opening Remarks</span></td>
+      </tr>
+      <tr>
+        <td class="time">09:15&ndash;09:45</td>
+        <td>
+          <span class="event-title">Invited Talk</span><br>
+          <span class="event-speaker">Kyunghyun Cho &middot; New York University</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="time">09:45&ndash;10:45</td>
+        <td>
+          <span class="event-title">Invited Talks</span><br>
+          <span class="event-speaker">Speakers to be announced</span>
+        </td>
+      </tr>
+      <tr class="break-row">
+        <td class="time">10:45&ndash;11:00</td>
+        <td>Coffee Break</td>
+      </tr>
+      <tr>
+        <td class="time">11:00&ndash;12:00</td>
+        <td>
+          <span class="event-title">Contributed Oral Presentations</span><br>
+          <span class="event-speaker">4 talks &middot; 10 min + 5 min Q&amp;A each</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="time">12:00&ndash;13:30</td>
+        <td><span class="event-title">Poster Session 1</span></td>
+      </tr>
+      <tr class="break-row">
+        <td class="time">13:30&ndash;14:00</td>
+        <td>Lunch Break</td>
+      </tr>
+      <tr>
+        <td class="time">14:00&ndash;14:30</td>
+        <td>
+          <span class="event-title">Invited Talk</span><br>
+          <span class="event-speaker">Ge Liu &middot; University of Illinois Urbana-Champaign</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="time">14:30&ndash;15:00</td>
+        <td>
+          <span class="event-title">Invited Talk</span><br>
+          <span class="event-speaker">Jiaxin Shi &middot; Meta</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="time">15:00&ndash;15:30</td>
+        <td>
+          <span class="event-title">Invited Talk</span><br>
+          <span class="event-speaker">Speaker to be announced</span>
+        </td>
+      </tr>
+      <tr class="break-row">
+        <td class="time">15:30&ndash;16:00</td>
+        <td>Coffee Break</td>
+      </tr>
+      <tr>
+        <td class="time">16:00&ndash;17:00</td>
+        <td>
+          <span class="event-title">Panel Discussion</span><br>
+          <span class="event-speaker">Arnaud Doucet, Eric Vanden-Eijnden, Luca Ambrogioni, Yilun Du</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="time">17:00&ndash;17:30</td>
+        <td><span class="event-title">Poster Session 2</span></td>
+      </tr>
+      <tr>
+        <td class="time">17:30&ndash;17:45</td>
+        <td><span class="event-title">Closing Remarks &amp; Best Paper Award</span></td>
+      </tr>
+    </table>
+  </div>
+</section>
+
+<!-- Speakers -->
+<section id="speakers">
+  <div class="container">
+    <div class="section-header">
+      <h2>Invited Speakers</h2>
+    </div>
+    <div class="people-grid">
+      <div class="person-card">
+        <div class="person-avatar" style="background: linear-gradient(135deg, #667eea, #764ba2);">KC</div>
+        <h3>Kyunghyun Cho</h3>
+        <div class="affiliation">New York University</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background: linear-gradient(135deg, #f093fb, #f5576c);">GL</div>
+        <h3>Ge Liu</h3>
+        <div class="affiliation">UIUC</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">JS</div>
+        <h3>Jiaxin Shi</h3>
+        <div class="affiliation">Meta</div>
+      </div>
+      <div class="more-coming">More speakers to be announced.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Panelists -->
+<section class="section-alt">
+  <div class="container">
+    <div class="section-header">
+      <h2>Panel Discussion</h2>
+    </div>
+    <div class="people-grid">
+      <div class="person-card">
+        <div class="person-avatar" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb);">AD</div>
+        <h3>Arnaud Doucet</h3>
+        <div class="affiliation">Google DeepMind</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background: linear-gradient(135deg, #ffecd2, #fcb69f);">EV</div>
+        <h3>Eric Vanden-Eijnden</h3>
+        <div class="affiliation">NYU Courant</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background: linear-gradient(135deg, #84fab0, #8fd3f4);">LA</div>
+        <h3>Luca Ambrogioni</h3>
+        <div class="affiliation">Radboud University</div>
+      </div>
+      <div class="person-card">
+        <div class="person-avatar" style="background: linear-gradient(135deg, #fbc2eb, #a6c1ee);">YD</div>
+        <h3>Yilun Du</h3>
+        <div class="affiliation">Harvard University</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Organizers -->
+<section id="organizers">
+  <div class="container">
+    <div class="section-header">
+      <h2>Organizers</h2>
+    </div>
+    <div class="people-grid">
+      <div class="person-card">
+        <img src="profile/jinwookim-profile.jpeg" alt="Jinwoo Kim" class="person-photo">
+        <h3>Jinwoo Kim</h3>
+        <div class="affiliation">KAIST</div>
+      </div>
+      <div class="person-card">
+        <img src="profile/floor.png" alt="Floor Eijkelboom" class="person-photo">
+        <h3>Floor Eijkelboom</h3>
+        <div class="affiliation">University of Amsterdam</div>
+      </div>
+      <div class="person-card">
+        <img src="profile/oscar.png" alt="Oscar Davis" class="person-photo">
+        <h3>Oscar Davis</h3>
+        <div class="affiliation">University of Oxford</div>
+      </div>
+      <div class="person-card">
+        <img src="profile/seunghoon.jpg" alt="Seunghoon Hong" class="person-photo">
+        <h3>Seunghoon Hong</h3>
+        <div class="affiliation">KAIST</div>
+      </div>
+      <div class="person-card">
+        <img src="profile/boffi.jpg" alt="Nicholas M. Boffi" class="person-photo">
+        <h3>Nicholas M. Boffi</h3>
+        <div class="affiliation">Carnegie Mellon University</div>
+      </div>
+      <div class="person-card">
+        <img src="profile/aditi.png" alt="Aditi Raghunathan" class="person-photo">
+        <h3>Aditi Raghunathan</h3>
+        <div class="affiliation">Carnegie Mellon University</div>
+      </div>
+      <div class="person-card">
+        <img src="profile/michael.png" alt="Michael S. Albergo" class="person-photo">
+        <h3>Michael S. Albergo</h3>
+        <div class="affiliation">Harvard University</div>
+      </div>
+      <div class="person-card">
+        <img src="profile/sander.png" alt="Sander Dieleman" class="person-photo">
+        <h3>Sander Dieleman</h3>
+        <div class="affiliation">Google DeepMind</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call for Papers -->
+<section id="cfp" class="section-alt">
+  <div class="container">
+    <div class="section-header">
+      <h2>Call for Papers</h2>
+      <p>We welcome original unpublished work and work under review. Published work at NeurIPS 2026 or other venues will not be accepted.</p>
+    </div>
+    <div class="submission-list">
+      <div class="topic-group">
+        <strong>Paper track</strong>
+        <ul>
+          <li>Extended abstracts or 4&ndash;8 page papers (excluding references and appendices).</li>
+          <li>Non-archival. Double-blind review by 3 reviewers on OpenReview.</li>
+          <li>Accepted papers designated as oral or poster. Best paper award for the top contribution.</li>
+        </ul>
+      </div>
+      <div class="topic-group">
+        <strong>Blogpost track</strong>
+        <ul>
+          <li>Max 2,000 words on key ideas or papers in the field.</li>
+          <li>Accessible format for sharing insights and opinions. Non-archival.</li>
+          <li>See the <a href="blog/">blogpost track page</a> for formatting guidelines and details.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="submission-note">
+      <p>Per NeurIPS 2026 policy, authors must disclose LLM use. Submission link will be available soon.</p>
+      <br>
+      <a href="#" class="btn btn-primary" style="pointer-events: none; opacity: 0.5;">Submit on OpenReview &mdash; Coming Soon</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="mailto:jinwoo-kim@kaist.ac.kr">Contact</a>
+      <a href="#cfp">Call for Papers</a>
+      <a href="blog/">Blogposts</a>
+      <a href="https://neurips.cc/Conferences/2026" target="_blank" rel="noopener">NeurIPS 2026</a>
+    </div>
+    <p class="footer-copy">DisCo &middot; NeurIPS 2026 Workshop Proposal &middot; Sydney, Australia</p>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+      document.querySelector('.nav-links').classList.remove('open');
+    });
+  });
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function updateCountdowns() {
+    var now = Date.now();
+    document.querySelectorAll('.date-countdown[data-date]').forEach(function(el) {
+      var target = new Date(el.getAttribute('data-date')).getTime();
+      var diff = target - now;
+      if (diff <= 0) {
+        el.textContent = '';
+        el.classList.add('past');
+        return;
+      }
+      var totalSec = Math.floor(diff / 1000);
+      var weeks = Math.floor(totalSec / 604800);
+      var days = Math.floor((totalSec % 604800) / 86400);
+      var hours = Math.floor((totalSec % 86400) / 3600);
+      var minutes = Math.floor((totalSec % 3600) / 60);
+      var seconds = totalSec % 60;
+      el.textContent = pad(weeks) + ' weeks ' + pad(days) + ' days ' + pad(hours) + ':' + pad(minutes) + ':' + pad(seconds);
+    });
+  }
+  updateCountdowns();
+  setInterval(updateCountdowns, 1000);
+</script>
+
+</body>
+</html>
